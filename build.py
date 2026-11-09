@@ -15,6 +15,7 @@ USE_CUSTOM_DOMAIN = False
 ROOT = Path(__file__).parent
 SRC = ROOT / "_mirror"
 OUT = ROOT / "docs"
+OVERRIDES = ROOT / "overrides"
 
 # Arquivos salvos pelo wget como "foo.css?ver=1.2.css" ou "foo.js?ver=1.2".
 QUERY_IN_NAME = re.compile(r"\?[^/]*$")
@@ -107,6 +108,10 @@ def main() -> None:
         if dest.name == "index.html":
             path = dest.parent.relative_to(OUT).as_posix()
             pages.append("/" if path == "." else f"/{path}/")
+
+    # Arquivos em overrides/ (ex.: imagens substituídas) prevalecem sobre a cópia do site original.
+    if OVERRIDES.exists():
+        shutil.copytree(OVERRIDES, OUT, dirs_exist_ok=True)
 
     # O 404 é servido em qualquer profundidade de URL, então mantém caminhos a partir da raiz.
     (OUT / "404.html").write_text(root_index, encoding="utf-8", errors="surrogateescape")

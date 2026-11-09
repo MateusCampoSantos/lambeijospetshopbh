@@ -19,4 +19,6 @@ Se o site original (WordPress) mudar e você quiser espelhar de novo:
 python3 build.py  # gera docs/ com o domínio novo
 ```
 
-Atenção: isso sobrescreve edições feitas manualmente em `docs/`.
+Atenção: isso sobrescreve edições feitas manualmente em `docs/`. Para uma alteração sobreviver ao rebuild,
+coloque o arquivo em `overrides/` com o mesmo caminho que ele tem em `docs/`. Os originais das imagens
+geradas ficam em `sources/`.
