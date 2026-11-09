@@ -1,0 +1,118 @@
+---
+import { Image } from "astro:assets";
+import Base from "../layouts/Base.astro";
+import StatusAberto from "../components/StatusAberto.astro";
+import Agendador from "../components/Agendador.astro";
+import Avaliacoes from "../components/Avaliacoes.astro";
+import ComoChegar from "../components/ComoChegar.astro";
+import Faq from "../components/Faq.astro";
+import { servicos, type Servico } from "../data/servicos";
+import { url, whatsapp } from "../lib/site";
+
+export function getStaticPaths() {
+  return servicos.map((s) => ({ params: { servico: s.slug }, props: { s } }));
+}
+
+const { s } = Astro.props as { s: Servico };
+const outros = servicos.filter((o) => o.slug !== s.slug);
+const agendadorInicial: Record<string, string> = {
+  "banho-e-tosa-castelo-bh": "banho-tosa",
+  "atendimento-veterinario-castelo-bh": "vet",
+  "racoes-e-nutricao-castelo-bh": "racao",
+  "medicamentos-pet-castelo-bh": "remedio",
+};
+
+const schema = [
+  {
+    "@type": "Service",
+    name: s.nome,
+    description: s.seoDescription,
+    provider: { "@id": new URL(`${import.meta.env.BASE_URL}#loja`, Astro.site).href },
+    areaServed: { "@type": "City", name: "Belo Horizonte" },
+  },
+  {
+    "@type": "FAQPage",
+    mainEntity: s.faq.map((f) => ({ "@type": "Question", name: f.pergunta, acceptedAnswer: { "@type": "Answer", text: f.resposta } })),
+  },
+];
+---
+
+<Base title={s.seoTitle} description={s.seoDescription} image={s.imagem} breadcrumbs={[{ name: s.nome, path: `${s.slug}/` }]} schema={schema}>
+  <section class="relative overflow-hidden">
+    <div class="pointer-events-none absolute -right-40 -top-40 size-[32rem] rounded-full bg-azul-100 blur-3xl" aria-hidden="true"></div>
+    <div class="container-site relative grid items-center gap-12 pb-16 pt-8 lg:grid-cols-[1.1fr_1fr] lg:pt-14">
+      <div>
+        <nav aria-label="Você está em" class="text-sm font-semibold text-gray-500">
+          <a href={url("/")} class="hover:text-azul-600">Início</a> <span aria-hidden="true">/</span> <span class="text-azul-700">{s.nome}</span>
+        </nav>
+        <div class="mt-5"><StatusAberto /></div>
+        <h1 class="mt-5 font-display text-4xl font-bold leading-[1.08] text-azul-900 sm:text-6xl">{s.h1}</h1>
+        <p class="mt-5 max-w-xl text-lg leading-relaxed text-gray-700 sm:text-xl">{s.lead}</p>
+        <div class="mt-8 flex flex-wrap gap-3">
+          <a href="#agendar" class="btn bg-lingua-600 text-white shadow-lg shadow-lingua-500/30 hover:brightness-110">{s.cta}</a>
+          <a href={whatsapp(s.mensagem)} class="btn-outline" rel="noopener">Tirar dúvida no WhatsApp</a>
+        </div>
+      </div>
+      <div class="relative mx-auto w-full max-w-sm lg:max-w-md">
+        <div class="aspect-[4/5] overflow-hidden rounded-[2.5rem] bg-azul-200 shadow-2xl shadow-azul-900/20 rotate-2">
+          <Image src={s.imagem} alt={s.imagemAlt} widths={[360, 600, 800]} sizes="(min-width: 1024px) 440px, 85vw" class="size-full object-cover" loading="eager" fetchpriority="high" />
+        </div>
+        <span class="absolute -left-6 -top-6 grid size-20 animate-float place-items-center rounded-3xl bg-white text-4xl shadow-xl" aria-hidden="true">{s.emoji}</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-16 sm:py-24">
+    <div class="container-site grid gap-12 lg:grid-cols-[1.4fr_1fr]">
+      <div class="prose-lg max-w-none space-y-5 text-lg leading-relaxed text-gray-700" data-reveal>
+        {s.paragrafos.map((p) => <p>{p}</p>)}
+      </div>
+      <ul class="grid gap-4">
+        {s.destaques.map((d, i) => (
+          <li class="flex gap-4 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/5" data-reveal style={`--reveal-delay:${i * 80}ms`}>
+            <span class="grid size-10 shrink-0 place-items-center rounded-full bg-azul-500 font-display font-bold text-white" aria-hidden="true">✓</span>
+            <span><strong class="block font-display text-lg text-azul-900">{d.titulo}</strong><span class="text-gray-600">{d.texto}</span></span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="bg-azul-50 py-16 sm:py-24">
+    <div class="container-site">
+      <h2 class="section-title" data-reveal>Como funciona</h2>
+      <ol class="mt-10 grid gap-6 md:grid-cols-3">
+        {s.passos.map((p, i) => (
+          <li class="relative rounded-[2rem] bg-white p-7 shadow-sm" data-reveal style={`--reveal-delay:${i * 100}ms`}>
+            <span class="font-display text-6xl font-bold text-azul-200" aria-hidden="true">{i + 1}</span>
+            <h3 class="mt-2 font-display text-xl font-semibold text-azul-900">{p.titulo}</h3>
+            <p class="mt-2 text-gray-600">{p.texto}</p>
+          </li>
+        ))}
+      </ol>
+      <div id="agendar" class="mt-14 scroll-mt-24">
+        <Agendador servico={agendadorInicial[s.slug]} titulo={s.cta} />
+      </div>
+    </div>
+  </section>
+
+  <Faq itens={s.faq} titulo={`Dúvidas sobre ${s.nome.toLowerCase()}`} />
+
+  <Avaliacoes />
+
+  <section class="py-16">
+    <div class="container-site">
+      <h2 class="section-title" data-reveal>Outros cuidados na mesma loja</h2>
+      <div class="mt-8 grid gap-4 sm:grid-cols-3">
+        {outros.map((o, i) => (
+          <a href={url(`/${o.slug}/`)} class="group flex items-center gap-4 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/5 transition hover:-translate-y-1 hover:shadow-lg" data-reveal style={`--reveal-delay:${i * 80}ms`}>
+            <span class="grid size-14 shrink-0 place-items-center rounded-2xl bg-azul-100 text-3xl transition group-hover:rotate-6" aria-hidden="true">{o.emoji}</span>
+            <span><strong class="block font-display text-lg text-azul-900">{o.nome}</strong><span class="text-sm text-gray-600">{o.resumo}</span></span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <ComoChegar />
+</Base>

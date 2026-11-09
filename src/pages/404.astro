@@ -1,0 +1,17 @@
+---
+import Base from "../layouts/Base.astro";
+import { servicos } from "../data/servicos";
+import { url } from "../lib/site";
+---
+
+<Base title="Página não encontrada | Lambeijos Pet Shop" description="A página que você procurou não existe. Veja os serviços do Lambeijos Pet Shop no Castelo, BH.">
+  <section class="container-site py-24 text-center">
+    <p class="animate-wiggle text-7xl" aria-hidden="true">🐶</p>
+    <h1 class="mt-6 font-display text-4xl font-bold text-azul-900 sm:text-6xl">Ops! Essa página fugiu para passear</h1>
+    <p class="mx-auto mt-4 max-w-xl text-lg text-gray-600">Ela não existe ou mudou de endereço. Que tal um destes caminhos?</p>
+    <div class="mt-10 flex flex-wrap justify-center gap-3">
+      <a href={url("/")} class="btn bg-azul-500 text-white hover:bg-azul-600">Página inicial</a>
+      {servicos.map((s) => <a href={url(`/${s.slug}/`)} class="btn-outline">{s.emoji} {s.nome}</a>)}
+    </div>
+  </section>
+</Base>

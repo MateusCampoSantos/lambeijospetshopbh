@@ -1,2 +1,3 @@
-_mirror/
-__pycache__/
+node_modules/
+dist/
+.astro/

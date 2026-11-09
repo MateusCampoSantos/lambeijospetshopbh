@@ -1,0 +1,62 @@
+---
+import { Image } from "astro:assets";
+import fachada from "../assets/img/fachada.webp";
+import StatusAberto from "./StatusAberto.astro";
+import { loja, enderecoCompleto, horarioLegivel, rotaGoogle, rotaWaze } from "../lib/site";
+
+const mapaSrc = `https://maps.google.com/maps?q=${encodeURIComponent(enderecoCompleto)}&z=16&output=embed`;
+---
+
+<section id="como-chegar" class="scroll-mt-24 py-20 sm:py-28">
+  <div class="container-site">
+    <div class="max-w-2xl" data-reveal>
+      <span class="eyebrow">📍 Como chegar</span>
+      <h2 class="section-title mt-4">Venha nos visitar no Castelo</h2>
+      <p class="mt-4 text-lg text-gray-600">
+        Na Av. Presidente Tancredo Neves, pertinho dos bairros Manacás, Ouro Preto, Alípio de Melo e região. Entrada e estacionamento acessíveis para cadeira de rodas.
+      </p>
+    </div>
+
+    <div class="mt-10 grid gap-6 lg:grid-cols-[1.3fr_1fr]">
+      <div class="mapa relative min-h-80 overflow-hidden rounded-[2rem] bg-azul-100 shadow-lg ring-1 ring-black/5" data-reveal data-src={mapaSrc}>
+        <Image src={fachada} alt={`Fachada do Pet Shop Lambeijos em ${enderecoCompleto}`} widths={[480, 800, 1280]} sizes="(min-width: 1024px) 640px, 100vw" class="absolute inset-0 size-full object-cover" />
+        <div class="absolute inset-0 bg-gradient-to-t from-azul-900/80 via-azul-900/10 to-transparent"></div>
+        <button type="button" class="carregar-mapa btn absolute bottom-5 left-5 bg-white text-azul-900 shadow-lg hover:bg-azul-50">
+          🗺️ Ver no mapa
+        </button>
+      </div>
+
+      <div class="grid gap-4">
+        <div class="rounded-[2rem] bg-white p-7 shadow-lg shadow-azul-900/5 ring-1 ring-black/5" data-reveal style="--reveal-delay:100ms">
+          <StatusAberto />
+          <address class="mt-5 not-italic">
+            <p class="font-display text-xl font-semibold text-azul-900">{loja.endereco.rua}</p>
+            <p class="text-gray-600">{loja.endereco.bairro}, {loja.endereco.cidade} - {loja.endereco.uf} · CEP {loja.endereco.cep}</p>
+          </address>
+          <dl class="mt-5 grid gap-2">
+            {horarioLegivel.map((h) => (
+              <div class="flex justify-between border-b border-dashed border-black/10 pb-2"><dt class="text-gray-600">{h.dias}</dt><dd class="font-semibold">{h.horas}</dd></div>
+            ))}
+          </dl>
+        </div>
+        <div class="grid grid-cols-2 gap-4" data-reveal style="--reveal-delay:200ms">
+          <a href={rotaGoogle} class="btn bg-azul-500 text-white hover:bg-azul-600" rel="noopener">Google Maps</a>
+          <a href={rotaWaze} class="btn bg-[#33ccff] text-azul-900 hover:brightness-95" rel="noopener">Waze</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll<HTMLElement>(".mapa").forEach((box) => {
+    box.querySelector(".carregar-mapa")?.addEventListener("click", () => {
+      const iframe = document.createElement("iframe");
+      iframe.src = box.dataset.src!;
+      iframe.title = "Mapa da localização do Pet Shop Lambeijos";
+      iframe.loading = "lazy";
+      iframe.className = "absolute inset-0 size-full border-0";
+      box.replaceChildren(iframe);
+    });
+  });
+</script>

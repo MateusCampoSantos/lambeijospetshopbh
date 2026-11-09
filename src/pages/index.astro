@@ -1,0 +1,239 @@
+---
+import { Image } from "astro:assets";
+import Base from "../layouts/Base.astro";
+import StatusAberto from "../components/StatusAberto.astro";
+import Agendador from "../components/Agendador.astro";
+import Avaliacoes from "../components/Avaliacoes.astro";
+import ComoChegar from "../components/ComoChegar.astro";
+import Faq from "../components/Faq.astro";
+import golden from "../assets/img/golden.webp";
+import caoBandana from "../assets/img/cao-bandana.webp";
+import fachada from "../assets/img/fachada.webp";
+import quatree from "../assets/img/marca-quatree.webp";
+import premier from "../assets/img/marca-premier.webp";
+import formulaNatural from "../assets/img/marca-formula-natural.webp";
+import { servicos } from "../data/servicos";
+import { loja, url, whatsapp } from "../lib/site";
+
+const notaBR = loja.avaliacoes.nota.toLocaleString("pt-BR");
+
+const diferenciais = ["Banho e tosa", "Veterinário", "Vacinas", "Ração a granel", "Delivery pelo WhatsApp", "Farmácia pet", "Petiscos e brinquedos", "Cães e gatos"];
+
+const categorias = [
+  { nome: "Rações para cães", emoji: "🐶", href: "caes/racoes/" },
+  { nome: "Rações para gatos", emoji: "🐱", href: "gatos/racoes/" },
+  { nome: "Farmácia", emoji: "💊", href: "farmacia/" },
+  { nome: "Petiscos", emoji: "🦴", href: "caes/petiscos/" },
+  { nome: "Brinquedos", emoji: "🎾", href: "caes/brinquedos/" },
+  { nome: "Higiene para cães", emoji: "🧴", href: "caes/higiene-e-limpeza/" },
+  { nome: "Higiene para gatos", emoji: "🧼", href: "gatos/higiene-e-beleza/" },
+  { nome: "Outros pets", emoji: "🐦", href: "outros-pets/" },
+];
+
+const faq = [
+  { pergunta: "Qual o horário de funcionamento?", resposta: "De segunda a sexta, das 8h às 19h, e aos sábados, das 8h às 17h. Aos domingos a loja fica fechada." },
+  { pergunta: "Onde fica o Lambeijos?", resposta: "Na Av. Presidente Tancredo Neves, 4755, no bairro Castelo, em Belo Horizonte (CEP 31330-430). A entrada e o estacionamento são acessíveis para cadeira de rodas." },
+  { pergunta: "Vocês fazem entrega?", resposta: "Sim! Fazemos delivery de rações e produtos. É só pedir pelo WhatsApp (31) 98272-4251." },
+  { pergunta: "Como agendo banho e tosa?", resposta: "Use o agendador desta página ou chame no WhatsApp informando o porte, a pelagem e o melhor dia. A equipe confirma o horário e o valor." },
+  { pergunta: "Vocês atendem gatos?", resposta: "Sim. Atendemos cães e gatos no banho e tosa, no veterinário e com rações e produtos para os dois." },
+  { pergunta: "Quais marcas de ração vocês têm?", resposta: "PremieR, Quatree e Fórmula Natural, além de ração a granel. Consulte a linha e o tamanho pelo WhatsApp." },
+];
+
+const faqSchema = {
+  "@type": "FAQPage",
+  mainEntity: faq.map((f) => ({ "@type": "Question", name: f.pergunta, acceptedAnswer: { "@type": "Answer", text: f.resposta } })),
+};
+---
+
+<Base
+  title="Lambeijos Pet Shop no Castelo, BH | Banho e Tosa, Veterinário e Rações"
+  description={`Pet shop no bairro Castelo, em Belo Horizonte, há mais de 10 anos. Banho e tosa, veterinário, rações e farmácia pet, com delivery. Nota ${notaBR} no Google. Agende pelo WhatsApp.`}
+  image={golden}
+  schema={[faqSchema]}
+>
+  <!-- Hero -->
+  <section class="relative overflow-hidden">
+    <div class="pointer-events-none absolute -right-40 -top-40 size-[36rem] rounded-full bg-azul-100 blur-3xl" aria-hidden="true"></div>
+    <div class="pointer-events-none absolute -bottom-32 -left-32 size-96 rounded-full bg-lingua-400/10 blur-3xl" aria-hidden="true"></div>
+
+    <div class="container-site relative grid items-center gap-12 pb-16 pt-10 lg:grid-cols-[1.1fr_1fr] lg:pb-24 lg:pt-16">
+      <div>
+        <StatusAberto />
+        <h1 class="mt-6 font-display text-[2.6rem] font-bold leading-[1.05] text-azul-900 sm:text-6xl lg:text-7xl">
+          O pet shop do Castelo que seu pet <span class="relative inline-block text-lingua-500">ama<svg class="absolute -bottom-2 left-0 w-full" viewBox="0 0 120 12" aria-hidden="true"><path d="M2 9c30-8 86-8 116 0" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg></span> visitar
+        </h1>
+        <p class="mt-6 max-w-xl text-lg leading-relaxed text-gray-700 sm:text-xl">
+          Banho e tosa, veterinário, rações e farmácia pet em Belo Horizonte, com o carinho de quem cuida de pets há mais de 10 anos.
+        </p>
+        <div class="mt-8 flex flex-wrap gap-3">
+          <a href="#agendar" class="btn bg-lingua-600 text-white shadow-lg shadow-lingua-500/30 hover:brightness-110">Agendar agora</a>
+          <a href={url("/#servicos")} class="btn-outline">Ver serviços</a>
+        </div>
+        <ul class="mt-10 flex flex-wrap gap-x-8 gap-y-3 text-sm font-semibold text-gray-700">
+          <li class="flex items-center gap-2"><span class="text-lg text-amber-400">★</span> {notaBR} no Google · {loja.avaliacoes.total} avaliações</li>
+          <li class="flex items-center gap-2"><span aria-hidden="true">🛵</span> Delivery pelo WhatsApp</li>
+          <li class="flex items-center gap-2"><span aria-hidden="true">♿</span> Loja acessível</li>
+        </ul>
+      </div>
+
+      <div class="relative mx-auto w-full max-w-md lg:max-w-none">
+        <div class="relative aspect-[4/5] overflow-hidden rounded-[45%_55%_50%_50%/55%_45%_55%_45%] bg-azul-200 shadow-2xl shadow-azul-900/20">
+          <Image src={golden} alt="Golden retriever olhando para a câmera" widths={[400, 640, 900]} sizes="(min-width: 1024px) 520px, 90vw" class="size-full object-cover object-[60%_center]" loading="eager" fetchpriority="high" />
+        </div>
+        <div class="absolute -left-4 top-10 animate-float rounded-2xl bg-white px-4 py-3 shadow-xl sm:-left-8">
+          <p class="font-display text-2xl font-bold text-azul-900">{notaBR} <span class="text-amber-400">★</span></p>
+          <p class="text-xs font-semibold text-gray-500">{loja.avaliacoes.total} avaliações no Google</p>
+        </div>
+        <div class="absolute -right-2 bottom-16 animate-float rounded-2xl bg-white px-4 py-3 shadow-xl [animation-delay:-3s] sm:-right-6">
+          <p class="flex items-center gap-2 font-display font-semibold text-azul-900"><span class="text-2xl" aria-hidden="true">🛁</span> Banho e tosa</p>
+          <p class="text-xs font-semibold text-gray-500">Para cães e gatos</p>
+        </div>
+        <span class="absolute -bottom-3 left-10 animate-wiggle text-5xl" aria-hidden="true">🐾</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Faixa animada -->
+  <div class="-rotate-1 overflow-hidden bg-azul-600 py-4 text-white" aria-hidden="true">
+    <div class="flex w-max animate-[marquee_35s_linear_infinite] gap-10 font-display text-xl font-semibold">
+      {[...diferenciais, ...diferenciais].map((d) => <span class="flex items-center gap-10 whitespace-nowrap">{d}<span class="text-lingua-400">♥</span></span>)}
+    </div>
+  </div>
+
+  <!-- Serviços -->
+  <section id="servicos" class="scroll-mt-24 py-20 sm:py-28">
+    <div class="container-site">
+      <div class="max-w-2xl" data-reveal>
+        <span class="eyebrow">🐾 Serviços</span>
+        <h2 class="section-title mt-4">Tudo o que seu pet precisa, num lugar só</h2>
+      </div>
+      <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {servicos.map((s, i) => (
+          <a href={url(`/${s.slug}/`)} class="group flex flex-col overflow-hidden rounded-[2rem] bg-white shadow-lg shadow-azul-900/5 ring-1 ring-black/5 transition duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-azul-900/10" data-reveal style={`--reveal-delay:${i * 90}ms`}>
+            <div class="relative aspect-[4/3] overflow-hidden">
+              <Image src={s.imagem} alt={s.imagemAlt} widths={[320, 560]} sizes="(min-width: 1024px) 280px, (min-width: 640px) 45vw, 90vw" class="size-full object-cover transition duration-500 group-hover:scale-110" />
+              <span class="absolute left-4 top-4 grid size-12 place-items-center rounded-2xl bg-white text-2xl shadow" aria-hidden="true">{s.emoji}</span>
+            </div>
+            <div class="flex flex-1 flex-col p-6">
+              <h3 class="font-display text-xl font-semibold text-azul-900">{s.nome}</h3>
+              <p class="mt-2 flex-1 text-gray-600">{s.resumo}</p>
+              <span class="mt-4 font-semibold text-azul-600 transition group-hover:translate-x-1">Saiba mais →</span>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Quem somos -->
+  <section id="quem-somos" class="scroll-mt-24 bg-azul-50 py-20 sm:py-28">
+    <div class="container-site grid items-center gap-12 lg:grid-cols-2">
+      <div class="relative" data-reveal>
+        <Image src={fachada} alt="Fachada do Pet Shop Lambeijos na Av. Presidente Tancredo Neves, bairro Castelo" widths={[480, 800, 1200]} sizes="(min-width: 1024px) 560px, 90vw" class="aspect-[4/3] rounded-[2rem] object-cover shadow-xl" />
+        <Image src={caoBandana} alt="Cachorro de bandana depois do banho no Lambeijos" width={240} class="absolute -bottom-8 -right-4 hidden w-40 rotate-6 rounded-3xl border-[6px] border-white object-cover shadow-xl sm:block lg:w-48" />
+      </div>
+      <div data-reveal style="--reveal-delay:120ms">
+        <span class="eyebrow">❤️ Quem somos</span>
+        <h2 class="section-title mt-4">Mais de 10 anos cuidando dos pets de BH</h2>
+        <p class="mt-5 text-lg leading-relaxed text-gray-700">
+          No Lambeijos, a ideia é simples: tratar cada pet como se fosse da família. Na nossa loja do bairro Castelo você encontra banho e tosa, atendimento veterinário, rações e farmácia pet, tudo no mesmo lugar.
+        </p>
+        <p class="mt-4 text-lg leading-relaxed text-gray-700">
+          Nossa equipe escuta, orienta e cuida de cada detalhe, e muitos clientes estão com a gente há anos.
+        </p>
+        <dl class="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
+          {[
+            { n: 10, sufixo: "+", label: "anos de loja" },
+            { n: 4.7, sufixo: "★", label: "no Google", decimal: true },
+            { n: loja.avaliacoes.total, sufixo: "", label: "avaliações" },
+            { n: 6, sufixo: "", label: "dias por semana" },
+          ].map((s) => (
+            <div class="rounded-2xl bg-white p-4 text-center shadow-sm">
+              <dt class="sr-only">{s.label}</dt>
+              <dd class="font-display text-3xl font-bold text-azul-600"><span data-count={s.n} data-decimal={s.decimal ? "1" : undefined}>{s.decimal ? s.n.toLocaleString("pt-BR") : s.n}</span>{s.sufixo}</dd>
+              <dd class="text-sm font-semibold text-gray-500" aria-hidden="true">{s.label}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <!-- Agendador -->
+  <div id="agendar" class="container-site scroll-mt-24 pt-20 sm:pt-28">
+    <Agendador />
+  </div>
+
+  <Avaliacoes />
+
+  <!-- Marcas + loja virtual -->
+  <section class="bg-white py-20 sm:py-28">
+    <div class="container-site">
+      <div class="grid items-center gap-10 lg:grid-cols-2">
+        <div data-reveal>
+          <span class="eyebrow">🥣 Marcas que confiamos</span>
+          <h2 class="section-title mt-4">Ração de qualidade e loja virtual</h2>
+          <p class="mt-4 text-lg text-gray-600">Trabalhamos com PremieR, Quatree e Fórmula Natural, além de ração a granel. Prefere comprar online? Conheça nossa loja virtual.</p>
+        </div>
+        <div class="grid grid-cols-3 gap-4" data-reveal style="--reveal-delay:100ms">
+          {[{ img: premier, nome: "PremieR", fundo: "bg-azul-900" }, { img: quatree, nome: "Quatree", fundo: "bg-creme" }, { img: formulaNatural, nome: "Fórmula Natural", fundo: "bg-creme" }].map((m) => (
+            <div class={`grid aspect-[3/2] place-items-center rounded-2xl p-4 ring-1 ring-black/5 transition hover:-translate-y-1 hover:shadow-lg ${m.fundo}`}>
+              <Image src={m.img} alt={`Logo ${m.nome}`} width={200} class="max-h-16 w-auto object-contain" />
+            </div>
+          ))}
+        </div>
+      </div>
+      <div class="mt-12 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {categorias.map((c, i) => (
+          <a href={`${loja.lojaVirtual}${c.href}`} class="group flex items-center gap-3 rounded-2xl bg-azul-50 px-4 py-4 font-semibold text-azul-900 transition hover:bg-azul-500 hover:text-white" rel="noopener" data-reveal style={`--reveal-delay:${i * 40}ms`}>
+            <span class="text-2xl transition group-hover:scale-125" aria-hidden="true">{c.emoji}</span>{c.nome}
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <ComoChegar />
+
+  <Faq itens={faq} />
+
+  <!-- CTA final -->
+  <section class="container-site">
+    <div class="relative overflow-hidden rounded-[2.5rem] bg-lingua-600 px-8 py-14 text-center text-white sm:px-16" data-reveal>
+      <span class="pointer-events-none absolute -left-6 top-4 rotate-[-20deg] text-8xl opacity-20" aria-hidden="true">🐾</span>
+      <span class="pointer-events-none absolute -right-4 bottom-0 rotate-[20deg] text-9xl opacity-20" aria-hidden="true">🐾</span>
+      <h2 class="font-display text-3xl font-bold sm:text-5xl">Seu pet merece Lambeijos</h2>
+      <p class="mx-auto mt-4 max-w-xl text-lg text-white/90">Chame a gente no WhatsApp e agende o próximo banho, consulta ou entrega.</p>
+      <a href={whatsapp("Olá! Vim pelo site do Lambeijos.")} class="btn mt-8 bg-white text-lingua-600 shadow-xl hover:bg-creme" rel="noopener">Falar no WhatsApp</a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  @keyframes marquee {
+    to { transform: translateX(-50%); }
+  }
+</style>
+
+<script>
+  const contadores = document.querySelectorAll<HTMLElement>("[data-count]");
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e) => {
+      if (!e.isIntersecting) return;
+      const el = e.target as HTMLElement;
+      io.unobserve(el);
+      if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      const alvo = Number(el.dataset.count);
+      const decimal = el.dataset.decimal === "1";
+      const inicio = performance.now();
+      const tick = (t: number) => {
+        const p = Math.min((t - inicio) / 1200, 1);
+        const v = alvo * (1 - Math.pow(1 - p, 3));
+        el.textContent = decimal ? v.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 }) : String(Math.round(v));
+        if (p < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    });
+  });
+  contadores.forEach((el) => io.observe(el));
+</script>

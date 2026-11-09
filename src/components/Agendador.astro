@@ -1,0 +1,131 @@
+---
+import { loja, whatsapp } from "../lib/site";
+
+interface Props {
+  servico?: string;
+  titulo?: string;
+}
+
+const opcoes = [
+  { id: "banho", label: "Banho", emoji: "🛁", precisaPorte: true },
+  { id: "banho-tosa", label: "Banho e tosa", emoji: "✂️", precisaPorte: true },
+  { id: "vet", label: "Veterinário", emoji: "🩺", precisaPorte: false },
+  { id: "racao", label: "Ração", emoji: "🥣", precisaPorte: false },
+  { id: "remedio", label: "Medicamento", emoji: "💊", precisaPorte: false },
+];
+const { servico = "banho-tosa", titulo = "Monte seu pedido em 30 segundos" } = Astro.props;
+const chip =
+  "cursor-pointer select-none rounded-full border-2 border-azul-200 bg-white px-4 py-2 font-semibold text-azul-900 transition hover:border-azul-400 has-[:checked]:border-azul-500 has-[:checked]:bg-azul-500 has-[:checked]:text-white has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-azul-500";
+---
+
+<section class="agendador rounded-[2rem] bg-white p-6 shadow-xl shadow-azul-900/5 ring-1 ring-black/5 sm:p-10" data-reveal>
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <h2 class="font-display text-2xl font-semibold text-azul-900 sm:text-3xl">{titulo}</h2>
+    <span class="eyebrow">Resposta pelo WhatsApp</span>
+  </div>
+
+  <form class="mt-8 grid gap-8 lg:grid-cols-[1fr_22rem]" action={`https://wa.me/${loja.whatsapp}`} method="get" target="_blank">
+    <div class="grid gap-7">
+      <fieldset>
+        <legend class="mb-3 font-display text-lg font-semibold">1. O que você precisa?</legend>
+        <div class="flex flex-wrap gap-2">
+          {opcoes.map((o) => (
+            <label class={chip}>
+              <input type="radio" name="servico" value={o.label} data-porte={String(o.precisaPorte)} class="sr-only" checked={o.id === servico} />
+              <span aria-hidden="true">{o.emoji}</span> {o.label}
+            </label>
+          ))}
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend class="mb-3 font-display text-lg font-semibold">2. Seu pet é…</legend>
+        <div class="flex flex-wrap gap-2">
+          <label class={chip}><input type="radio" name="pet" value="cão" class="sr-only" checked /> 🐶 Cachorro</label>
+          <label class={chip}><input type="radio" name="pet" value="gato" class="sr-only" /> 🐱 Gato</label>
+        </div>
+      </fieldset>
+
+      <fieldset class="campo-porte">
+        <legend class="mb-3 font-display text-lg font-semibold">3. Porte e pelagem</legend>
+        <div class="flex flex-wrap gap-2">
+          {["Mini", "Pequeno", "Médio", "Grande"].map((p, i) => (
+            <label class={chip}><input type="radio" name="porte" value={p.toLowerCase()} class="sr-only" checked={i === 1} /> {p}</label>
+          ))}
+        </div>
+        <div class="mt-3 flex flex-wrap gap-2">
+          {["Curta", "Longa", "Com nós"].map((p, i) => (
+            <label class={chip}><input type="radio" name="pelagem" value={p.toLowerCase()} class="sr-only" checked={i === 0} /> Pelo {p.toLowerCase()}</label>
+          ))}
+        </div>
+      </fieldset>
+
+      <div class="grid gap-4 sm:grid-cols-2">
+        <label class="grid gap-2 font-semibold">
+          Nome do pet <span class="font-normal text-gray-500">(opcional)</span>
+          <input name="nome" type="text" autocomplete="off" placeholder="Ex.: Amora" class="rounded-2xl border-2 border-azul-200 bg-azul-50/50 px-4 py-3 font-normal outline-none focus:border-azul-500" />
+        </label>
+        <label class="grid gap-2 font-semibold">
+          Melhor dia
+          <select name="dia" class="rounded-2xl border-2 border-azul-200 bg-azul-50/50 px-4 py-3 font-normal outline-none focus:border-azul-500">
+            <option value="">Qualquer dia</option>
+            {["segunda", "terça", "quarta", "quinta", "sexta", "sábado"].map((d) => <option value={d}>{d[0].toUpperCase() + d.slice(1)}</option>)}
+          </select>
+        </label>
+      </div>
+    </div>
+
+    <div class="flex flex-col rounded-3xl bg-[#e7ddd3] p-4">
+      <p class="mb-3 text-center text-xs font-semibold uppercase tracking-wider text-black/50">Prévia da mensagem</p>
+      <div class="relative ml-auto max-w-[95%] rounded-2xl rounded-tr-sm bg-[#d9fdd3] px-4 py-3 text-[0.95rem] leading-relaxed shadow-sm">
+        <p class="previa whitespace-pre-line" aria-live="polite">Olá! Vim pelo site e quero agendar banho e tosa.</p>
+        <span class="mt-1 block text-right text-xs text-black/40">agora ✓✓</span>
+      </div>
+      <input type="hidden" name="text" value="" />
+      <button type="submit" class="btn-whats mt-auto w-full translate-y-0 pt-3.5 text-lg">Enviar no WhatsApp</button>
+    </div>
+  </form>
+  <noscript>
+    <a href={whatsapp("Olá! Vim pelo site do Lambeijos.")} class="btn-whats mt-4">Abrir WhatsApp</a>
+  </noscript>
+</section>
+
+<script>
+  document.querySelectorAll<HTMLFormElement>(".agendador form").forEach((form) => {
+    const previa = form.querySelector(".previa")!;
+    const texto = form.querySelector<HTMLInputElement>('input[name="text"]')!;
+    const campoPorte = form.querySelector<HTMLElement>(".campo-porte")!;
+    const valor = (n: string) => (form.elements.namedItem(n) as RadioNodeList | HTMLInputElement).value.trim();
+
+    function montar() {
+      const radio = form.querySelector<HTMLInputElement>('input[name="servico"]:checked')!;
+      const servico = radio.value;
+      const precisaPorte = radio.dataset.porte === "true";
+      campoPorte.hidden = !precisaPorte;
+      const nome = valor("nome");
+      const pet = valor("pet");
+      const dia = valor("dia");
+
+      const linhas = [`Olá! Vim pelo site e gostaria de: *${servico}*.`];
+      const sobre = nome ? `${nome}, meu ${pet}` : `Meu pet é ${pet === "cão" ? "um cachorro" : "um gato"}`;
+      if (precisaPorte) linhas.push(`${sobre}, porte ${valor("porte")}, pelo ${valor("pelagem")}.`);
+      else linhas.push(`${sobre}.`);
+      if (dia) linhas.push(`Prefiro ${dia === "sábado" ? "no sábado" : `na ${dia}`}.`);
+      if (servico === "Ração") linhas.push("Posso mandar uma foto da embalagem.");
+      if (servico === "Medicamento") linhas.push("Vou enviar a receita com nome e concentração.");
+
+      const msg = linhas.join("\n");
+      previa.textContent = msg;
+      texto.value = msg;
+    }
+
+    form.addEventListener("input", montar);
+    form.addEventListener("change", montar);
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      montar();
+      window.open(`${form.action}?text=${encodeURIComponent(texto.value)}`, "_blank", "noopener");
+    });
+    montar();
+  });
+</script>

@@ -1,0 +1,69 @@
+---
+import { loja } from "../lib/site";
+
+interface Props {
+  class?: string;
+}
+const { class: className = "" } = Astro.props;
+---
+
+<span
+  class:list={["status-aberto inline-flex items-center gap-2 rounded-full bg-white/90 px-3 py-1 text-sm font-semibold text-tinta shadow-sm ring-1 ring-black/5", className]}
+  data-horario={JSON.stringify(loja.horario)}
+>
+  <span class="dot relative flex size-2.5">
+    <span class="ping absolute inline-flex size-full rounded-full opacity-75"></span>
+    <span class="core relative inline-flex size-2.5 rounded-full bg-gray-400"></span>
+  </span>
+  <span class="label">Seg a sex 8h–19h · Sáb 8h–17h</span>
+</span>
+
+<script>
+  const dias = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+  type Faixa = { dias: string[]; abre: string; fecha: string };
+
+  function agoraEmBH() {
+    const partes = new Intl.DateTimeFormat("en-US", {
+      timeZone: "America/Sao_Paulo",
+      weekday: "short",
+      hour: "2-digit",
+      minute: "2-digit",
+      hourCycle: "h23",
+    }).formatToParts(new Date());
+    const get = (t: string) => partes.find((p) => p.type === t)!.value;
+    return { dia: get("weekday").slice(0, 2), minutos: Number(get("hour")) * 60 + Number(get("minute")) };
+  }
+
+  const paraMin = (h: string) => Number(h.slice(0, 2)) * 60 + Number(h.slice(3, 5));
+  const hora = (h: string) => `${Number(h.slice(0, 2))}h${h.slice(3) === "00" ? "" : h.slice(3)}`;
+
+  function proximaAbertura(horario: Faixa[], dia: string, minutos: number) {
+    for (let i = 0; i < 7; i++) {
+      const d = dias[(dias.indexOf(dia) + i) % 7];
+      const faixa = horario.find((f) => f.dias.includes(d));
+      if (faixa && (i > 0 || minutos < paraMin(faixa.abre))) {
+        const quando = i === 0 ? "hoje" : i === 1 ? "amanhã" : ({ Mo: "segunda", Tu: "terça", We: "quarta", Th: "quinta", Fr: "sexta", Sa: "sábado" } as Record<string, string>)[d];
+        return `Abre ${quando} às ${hora(faixa.abre)}`;
+      }
+    }
+    return "";
+  }
+
+  document.querySelectorAll<HTMLElement>(".status-aberto").forEach((el) => {
+    const horario: Faixa[] = JSON.parse(el.dataset.horario!);
+    const { dia, minutos } = agoraEmBH();
+    const hoje = horario.find((f) => f.dias.includes(dia));
+    const aberto = !!hoje && minutos >= paraMin(hoje.abre) && minutos < paraMin(hoje.fecha);
+    const label = el.querySelector(".label")!;
+    const core = el.querySelector(".core")!;
+    const ping = el.querySelector(".ping")!;
+    if (aberto) {
+      label.textContent = `Aberto agora · fecha às ${hora(hoje!.fecha)}`;
+      core.classList.replace("bg-gray-400", "bg-emerald-500");
+      ping.classList.add("bg-emerald-400", "animate-ping");
+    } else {
+      label.textContent = `Fechado · ${proximaAbertura(horario, dia, minutos)}`;
+      core.classList.replace("bg-gray-400", "bg-lingua-500");
+    }
+  });
+</script>

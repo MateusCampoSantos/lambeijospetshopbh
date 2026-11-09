@@ -1,0 +1,64 @@
+{
+  "nome": "Pet Shop Lambeijos",
+  "fonte": "Google Maps, consultado em 2026-11-09",
+  "telefone": "+5531982724251",
+  "telefoneExibicao": "(31) 98272-4251",
+  "whatsapp": "5531982724251",
+  "instagram": "https://www.instagram.com/lambeijospetshop/",
+  "lojaVirtual": "https://www.lambeijospetshop.com.br/",
+  "endereco": {
+    "rua": "Av. Presidente Tancredo Neves, 4755",
+    "bairro": "Castelo",
+    "cidade": "Belo Horizonte",
+    "uf": "MG",
+    "cep": "31330-430",
+    "pais": "BR"
+  },
+  "geo": { "lat": -19.8741671, "lng": -43.9936828 },
+  "googleMaps": "https://maps.google.com/?cid=9209144904752199889",
+  "horario": [
+    { "dias": ["Mo", "Tu", "We", "Th", "Fr"], "abre": "08:00", "fecha": "19:00" },
+    { "dias": ["Sa"], "abre": "08:00", "fecha": "17:00" }
+  ],
+  "acessibilidade": [
+    "Entrada acessível para cadeira de rodas",
+    "Estacionamento acessível para cadeira de rodas"
+  ],
+  "avaliacoes": {
+    "nota": 4.7,
+    "total": 441,
+    "distribuicao": { "5": 379, "4": 35, "3": 2, "2": 9, "1": 16 },
+    "temasMaisCitados": ["banho e tosa", "preços", "veterinário", "ração"],
+    "destaques": [
+      {
+        "autor": "Marcia Faria",
+        "nota": 5,
+        "texto": "Sempre levo meus gatos pra tomar banho na Lambeijos, dessa última vez tosei o pêlo deles, ficou ótimo. São muito atenciosos com a gente e com minha cachorrinha de 17 anos, ainda mais. Obrigada pelo carinho!!"
+      },
+      {
+        "autor": "Solange Maria Gonçalves Silva",
+        "nota": 5,
+        "texto": "Sempre ótima. Sou cliente desde 2018 e minha Shitzu é simplesmente apaixonada. Quando fala vamos tomar banho no Lambeijos ela falta falar de alegria!♥️"
+      },
+      {
+        "autor": "Dayse F. Neves",
+        "nota": 5,
+        "texto": "Eu amo o Lambeijos. Não troco por nenhum outro. O carinho que eles tem pelos nossos Pets é sem igual! Nunca machucaram eles. A educação dos atendentes é marca forte principalmente da Bia!"
+      },
+      {
+        "autor": "Elaine",
+        "nota": 5,
+        "texto": "Só tenho elogios a fazer! Amora sempre toma banho e faz tosa aqui, e é nítido o carinho, o cuidado e o profissionalismo de toda a equipe. Ela fica linda, cheirosa e, principalmente, tranquila e bem cuidada. Dá para perceber que eles realmente gostam dos animais e tratam cada um com muito carinho. Confio de olhos fechados e super recomendo o pet shop!"
+      },
+      {
+        "autor": "Luciana Dias",
+        "nota": 5,
+        "texto": "Excelente. Os profissionais são mto cuidadosos e amorosos. Minha cachorrinha é sempre muito bem tratada e volta cheirosa e limpinha. Eles vendem ração a granel e a loja tem mtos produtos bons. Só tenho elogios a fazer."
+      }
+    ],
+    "trechos": [
+      "Loja excelente, com ótimo mix de produtos, ótimos preços e vendedores.",
+      "Gostei da variedade de produtos, boas rações, petiscos, mimos e roupinhas."
+    ]
+  }
+}

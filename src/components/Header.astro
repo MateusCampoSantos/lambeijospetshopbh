@@ -1,0 +1,100 @@
+---
+import { Image } from "astro:assets";
+import logo from "../assets/img/logo.webp";
+import { url, whatsapp, loja } from "../lib/site";
+import { servicos } from "../data/servicos";
+
+const links = [
+  { href: url("/#servicos"), label: "Serviços" },
+  { href: url("/#avaliacoes"), label: "Avaliações" },
+  { href: url("/bairros-atendidos/"), label: "Bairros" },
+  { href: url("/#como-chegar"), label: "Como chegar" },
+];
+const atual = Astro.url.pathname;
+---
+
+<header class="sticky top-0 z-40 border-b border-black/5 bg-creme/85 backdrop-blur-md">
+  <a href="#conteudo" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:rounded-lg focus:bg-white focus:p-3">
+    Pular para o conteúdo
+  </a>
+  <div class="container-site flex h-18 items-center justify-between gap-4">
+    <a href={url("/")} class="shrink-0" aria-label="Pet Shop Lambeijos: página inicial">
+      <Image src={logo} alt="Lambeijos Pet Shop" width={180} height={63} class="h-12 w-auto" loading="eager" />
+    </a>
+
+    <nav aria-label="Principal" class="hidden items-center gap-1 lg:flex">
+      <div class="group relative">
+        <a href={links[0].href} class="rounded-full px-4 py-2 font-semibold text-azul-900 transition hover:bg-azul-100">
+          Serviços <span aria-hidden="true" class="text-xs">▾</span>
+        </a>
+        <div class="invisible absolute left-0 top-full w-64 translate-y-2 rounded-2xl bg-white p-2 opacity-0 shadow-xl ring-1 ring-black/5 transition group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
+          {servicos.map((s) => (
+            <a
+              href={url(`/${s.slug}/`)}
+              aria-current={atual.endsWith(`/${s.slug}/`) ? "page" : undefined}
+              class="flex items-center gap-3 rounded-xl px-3 py-2.5 font-semibold text-azul-900 hover:bg-azul-50 aria-[current=page]:bg-azul-100"
+            >
+              <span class="text-xl" aria-hidden="true">{s.emoji}</span>{s.nome}
+            </a>
+          ))}
+        </div>
+      </div>
+      {links.slice(1).map((l) => (
+        <a href={l.href} class="rounded-full px-4 py-2 font-semibold text-azul-900 transition hover:bg-azul-100">{l.label}</a>
+      ))}
+      <a href={loja.lojaVirtual} class="rounded-full px-4 py-2 font-semibold text-azul-900 transition hover:bg-azul-100" rel="noopener">
+        Loja virtual ↗
+      </a>
+    </nav>
+
+    <div class="flex items-center gap-2">
+      <a href={whatsapp("Olá! Vim pelo site do Lambeijos.")} class="btn-whats hidden px-5 py-2.5 text-base sm:inline-flex" rel="noopener">
+        Chamar no WhatsApp
+      </a>
+      <button
+        id="menu-toggle"
+        type="button"
+        class="grid size-11 place-items-center rounded-full bg-azul-100 text-azul-900 lg:hidden"
+        aria-expanded="false"
+        aria-controls="menu-mobile"
+        aria-label="Abrir menu"
+      >
+        <svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+          <path class="l1 origin-center transition" d="M4 7h16" /><path class="l2 transition" d="M4 12h16" /><path class="l3 origin-center transition" d="M4 17h16" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <nav id="menu-mobile" aria-label="Menu" class="hidden border-t border-black/5 bg-creme lg:hidden">
+    <div class="container-site grid gap-1 py-4">
+      {servicos.map((s) => (
+        <a href={url(`/${s.slug}/`)} class="flex items-center gap-3 rounded-2xl px-3 py-3 text-lg font-semibold text-azul-900 hover:bg-azul-50">
+          <span aria-hidden="true">{s.emoji}</span>{s.nome}
+        </a>
+      ))}
+      <hr class="my-2 border-black/10" />
+      {links.slice(1).map((l) => (
+        <a href={l.href} class="rounded-2xl px-3 py-3 text-lg font-semibold text-azul-900 hover:bg-azul-50">{l.label}</a>
+      ))}
+      <a href={loja.lojaVirtual} class="rounded-2xl px-3 py-3 text-lg font-semibold text-azul-900 hover:bg-azul-50" rel="noopener">Loja virtual ↗</a>
+    </div>
+  </nav>
+</header>
+
+<script>
+  const btn = document.getElementById("menu-toggle")!;
+  const menu = document.getElementById("menu-mobile")!;
+  const toggle = (abrir: boolean) => {
+    btn.setAttribute("aria-expanded", String(abrir));
+    btn.setAttribute("aria-label", abrir ? "Fechar menu" : "Abrir menu");
+    menu.classList.toggle("hidden", !abrir);
+    btn.querySelector(".l1")!.classList.toggle("translate-y-[5px]", abrir);
+    btn.querySelector(".l1")!.classList.toggle("rotate-45", abrir);
+    btn.querySelector(".l2")!.classList.toggle("opacity-0", abrir);
+    btn.querySelector(".l3")!.classList.toggle("-translate-y-[5px]", abrir);
+    btn.querySelector(".l3")!.classList.toggle("-rotate-45", abrir);
+  };
+  btn.addEventListener("click", () => toggle(btn.getAttribute("aria-expanded") !== "true"));
+  menu.querySelectorAll("a").forEach((a) => a.addEventListener("click", () => toggle(false)));
+</script>

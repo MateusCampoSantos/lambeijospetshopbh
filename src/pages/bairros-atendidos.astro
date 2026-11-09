@@ -1,0 +1,99 @@
+---
+import Base from "../layouts/Base.astro";
+import ComoChegar from "../components/ComoChegar.astro";
+import { bairros } from "../data/bairros";
+import { servicos } from "../data/servicos";
+import { url, whatsapp, rotaGoogle } from "../lib/site";
+---
+
+<Base
+  title="Pet Shop perto de você: Castelo, Pampulha e Noroeste de BH | Lambeijos"
+  description="O Lambeijos fica no bairro Castelo, em BH, e atende tutores do Manacás, Ouro Preto, Alípio de Melo, Paquetá, Serrano, Glória e mais bairros. Delivery pelo WhatsApp."
+  breadcrumbs={[{ name: "Bairros atendidos", path: "bairros-atendidos/" }]}
+>
+  <section class="relative overflow-hidden">
+    <div class="pointer-events-none absolute -right-40 -top-40 size-[32rem] rounded-full bg-azul-100 blur-3xl" aria-hidden="true"></div>
+    <div class="container-site relative pb-10 pt-10 lg:pt-16">
+      <nav aria-label="Você está em" class="text-sm font-semibold text-gray-500">
+        <a href={url("/")} class="hover:text-azul-600">Início</a> <span aria-hidden="true">/</span> <span class="text-azul-700">Bairros atendidos</span>
+      </nav>
+      <h1 class="mt-5 max-w-3xl font-display text-4xl font-bold leading-[1.08] text-azul-900 sm:text-6xl">
+        Um pet shop pertinho de você, no Castelo
+      </h1>
+      <p class="mt-5 max-w-2xl text-lg leading-relaxed text-gray-700 sm:text-xl">
+        Nossa loja fica na Av. Presidente Tancredo Neves, 4755. Tutores de vários bairros vizinhos trazem seus pets para banho, tosa e consultas, e quem prefere ficar em casa pode pedir ração e produtos por delivery.
+      </p>
+    </div>
+  </section>
+
+  <section class="py-10">
+    <div class="container-site">
+      <div class="rounded-[2rem] bg-white p-7 shadow-lg shadow-azul-900/5 ring-1 ring-black/5 sm:p-10" data-reveal>
+        <div class="flex flex-wrap items-end justify-between gap-4">
+          <h2 class="font-display text-2xl font-semibold text-azul-900 sm:text-3xl">Bairros de onde nossos clientes vêm</h2>
+          <label class="relative w-full sm:w-72">
+            <span class="sr-only">Procurar bairro</span>
+            <input id="filtro-bairro" type="search" placeholder="Procure seu bairro…" class="w-full rounded-full border-2 border-azul-200 bg-azul-50/50 px-5 py-3 outline-none focus:border-azul-500" />
+          </label>
+        </div>
+        <ul id="lista-bairros" class="mt-8 flex flex-wrap gap-3">
+          {bairros.map((b) => (
+            <li id={b.slugAntigo} data-nome={b.nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()}>
+              <a
+                href={whatsapp(`Olá! Moro no bairro ${b.nome} e vim pelo site do Lambeijos.`)}
+                class="inline-flex items-center gap-2 rounded-full bg-azul-50 px-5 py-2.5 font-semibold text-azul-900 ring-1 ring-azul-100 transition hover:bg-azul-500 hover:text-white"
+                rel="noopener"
+              >
+                📍 {b.nome}
+              </a>
+            </li>
+          ))}
+        </ul>
+        <p id="sem-bairro" class="mt-6 hidden text-gray-600">
+          Não achou seu bairro? <a class="font-semibold text-azul-600 underline" href={whatsapp("Olá! Vim pelo site do Lambeijos e queria saber se vocês atendem meu bairro.")} rel="noopener">Pergunte pelo WhatsApp</a>, inclusive sobre entrega.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-16">
+    <div class="container-site grid gap-6 md:grid-cols-3">
+      <div class="rounded-[2rem] bg-azul-500 p-8 text-white" data-reveal>
+        <p class="text-4xl" aria-hidden="true">🛵</p>
+        <h2 class="mt-4 font-display text-2xl font-semibold">Delivery</h2>
+        <p class="mt-2 text-white/90">Peça ração, petiscos e produtos pelo WhatsApp e receba em casa.</p>
+      </div>
+      <div class="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-black/5" data-reveal style="--reveal-delay:100ms">
+        <p class="text-4xl" aria-hidden="true">🚗</p>
+        <h2 class="mt-4 font-display text-2xl font-semibold text-azul-900">Fácil de chegar</h2>
+        <p class="mt-2 text-gray-600">Na Av. Presidente Tancredo Neves, com estacionamento acessível. <a href={rotaGoogle} class="font-semibold text-azul-600 underline" rel="noopener">Traçar rota</a>.</p>
+      </div>
+      <div class="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-black/5" data-reveal style="--reveal-delay:200ms">
+        <p class="text-4xl" aria-hidden="true">🐾</p>
+        <h2 class="mt-4 font-display text-2xl font-semibold text-azul-900">Tudo num lugar</h2>
+        <ul class="mt-2 space-y-1">
+          {servicos.map((s) => <li><a href={url(`/${s.slug}/`)} class="font-semibold text-azul-600 hover:underline">{s.nome}</a></li>)}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <ComoChegar />
+</Base>
+
+<script>
+  const input = document.getElementById("filtro-bairro") as HTMLInputElement;
+  const itens = document.querySelectorAll<HTMLElement>("#lista-bairros li");
+  const vazio = document.getElementById("sem-bairro")!;
+  const normalizar = (t: string) => t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+  input.addEventListener("input", () => {
+    const q = normalizar(input.value);
+    let visiveis = 0;
+    itens.forEach((li) => {
+      const mostra = li.dataset.nome!.includes(q);
+      li.hidden = !mostra;
+      if (mostra) visiveis++;
+    });
+    vazio.classList.toggle("hidden", visiveis > 0 && q !== "");
+  });
+</script>

@@ -1,0 +1,147 @@
+---
+import "../styles/global.css";
+import { getImage } from "astro:assets";
+import fredokaWoff2 from "@fontsource-variable/fredoka/files/fredoka-latin-wght-normal.woff2?url";
+import nunitoWoff2 from "@fontsource-variable/nunito/files/nunito-latin-wght-normal.woff2?url";
+import fachada from "../assets/img/fachada.webp";
+import logo from "../assets/img/logo.webp";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import { loja, whatsapp } from "../lib/site";
+import { servicos } from "../data/servicos";
+import { bairros } from "../data/bairros";
+
+interface Props {
+  title: string;
+  description: string;
+  image?: ImageMetadata;
+  breadcrumbs?: { name: string; path: string }[];
+  schema?: Record<string, unknown>[];
+}
+
+const { title, description, image = fachada, breadcrumbs = [], schema = [] } = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const abs = (path: string) => new URL(path, Astro.site).href;
+const og = await getImage({ src: image, width: 1200, height: 630, format: "jpg", fit: "cover" });
+const logoImg = await getImage({ src: logo, width: 600, format: "png" });
+const fachadaImg = await getImage({ src: fachada, width: 1200, format: "jpg" });
+const raiz = abs(import.meta.env.BASE_URL);
+
+const lojaSchema = {
+  "@type": "PetStore",
+  "@id": `${raiz}#loja`,
+  name: loja.nome,
+  url: raiz,
+  image: abs(fachadaImg.src),
+  logo: abs(logoImg.src),
+  telephone: loja.telefone,
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: loja.endereco.rua,
+    addressLocality: loja.endereco.cidade,
+    addressRegion: loja.endereco.uf,
+    postalCode: loja.endereco.cep,
+    addressCountry: loja.endereco.pais,
+  },
+  geo: { "@type": "GeoCoordinates", latitude: loja.geo.lat, longitude: loja.geo.lng },
+  hasMap: loja.googleMaps,
+  openingHoursSpecification: loja.horario.map((h) => ({
+    "@type": "OpeningHoursSpecification",
+    dayOfWeek: h.dias.map((d) => `https://schema.org/${({ Mo: "Monday", Tu: "Tuesday", We: "Wednesday", Th: "Thursday", Fr: "Friday", Sa: "Saturday" } as Record<string, string>)[d]}`),
+    opens: h.abre,
+    closes: h.fecha,
+  })),
+  areaServed: [
+    { "@type": "City", name: "Belo Horizonte" },
+    ...bairros.map((b) => ({ "@type": "Place", name: `${b.nome}, Belo Horizonte` })),
+  ],
+  sameAs: [loja.instagram, loja.googleMaps, loja.lojaVirtual],
+  hasOfferCatalog: {
+    "@type": "OfferCatalog",
+    name: "Serviços",
+    itemListElement: servicos.map((s) => ({
+      "@type": "Offer",
+      itemOffered: { "@type": "Service", name: s.nome, url: abs(`${import.meta.env.BASE_URL}${s.slug}/`) },
+    })),
+  },
+};
+
+const graph = [
+  lojaSchema,
+  { "@type": "WebSite", "@id": `${raiz}#site`, url: raiz, name: loja.nome, inLanguage: "pt-BR", publisher: { "@id": `${raiz}#loja` } },
+  ...(breadcrumbs.length
+    ? [{
+        "@type": "BreadcrumbList",
+        itemListElement: [{ name: "Início", path: "" }, ...breadcrumbs].map((b, i) => ({
+          "@type": "ListItem",
+          position: i + 1,
+          name: b.name,
+          item: abs(`${import.meta.env.BASE_URL}${b.path}`),
+        })),
+      }]
+    : []),
+  ...schema,
+];
+---
+
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <link rel="preload" href={fredokaWoff2} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={nunitoWoff2} as="font" type="font/woff2" crossorigin />
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta name="theme-color" content="#1e8fe1" />
+    <link rel="icon" href={`${import.meta.env.BASE_URL}favicon-32.png`} sizes="32x32" />
+    <link rel="icon" href={`${import.meta.env.BASE_URL}icon-192.png`} sizes="192x192" />
+    <link rel="apple-touch-icon" href={`${import.meta.env.BASE_URL}apple-touch-icon.png`} />
+    <link rel="sitemap" href={`${import.meta.env.BASE_URL}sitemap-index.xml`} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="pt_BR" />
+    <meta property="og:site_name" content={loja.nome} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={abs(og.src)} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <script type="application/ld+json" set:html={JSON.stringify({ "@context": "https://schema.org", "@graph": graph })} />
+    <script is:inline>document.documentElement.classList.add("js")</script>
+  </head>
+  <body>
+    <Header />
+    <main id="conteudo">
+      <slot />
+    </main>
+    <Footer />
+
+    <a
+      href={whatsapp("Olá! Vim pelo site do Lambeijos.")}
+      class="fixed bottom-5 right-5 z-50 grid size-16 place-items-center rounded-full bg-whats text-white shadow-xl shadow-black/20 transition hover:scale-110 sm:hidden"
+      aria-label="Conversar no WhatsApp"
+      rel="noopener"
+    >
+      <svg class="size-8" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.5 14.4c-.3-.1-1.8-.9-2-1-.3-.1-.5-.1-.7.1-.2.3-.8 1-.9 1.2-.2.2-.3.2-.6.1-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.4-.5c.2-.2.2-.3.3-.5.1-.2 0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.8-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.1-.3-.2-.6-.3zM12 21.8a9.8 9.8 0 0 1-5-1.4l-.4-.2-3.7 1 1-3.6-.2-.4A9.8 9.8 0 1 1 12 21.8zm8.4-18.2A11.8 11.8 0 0 0 1.7 17.8L0 24l6.3-1.7a11.8 11.8 0 0 0 5.7 1.4A11.8 11.8 0 0 0 20.4 3.6z"/></svg>
+    </a>
+
+    <script>
+      const io = new IntersectionObserver(
+        (entries) => entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add("is-visible");
+            io.unobserve(e.target);
+          }
+        }),
+        { rootMargin: "0px 0px -10% 0px" },
+      );
+      document.querySelectorAll("[data-reveal]").forEach((el) => io.observe(el));
+    </script>
+  </body>
+</html>

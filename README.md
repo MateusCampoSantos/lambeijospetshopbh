@@ -1,24 +1,31 @@
 # lambeijospetshopbh.com.br
 
-Cópia estática de https://petshopcastelobh.com.br/ publicada no GitHub Pages a partir da pasta `docs/`.
+Site do Pet Shop Lambeijos (Castelo, Belo Horizonte), feito com [Astro](https://astro.build) e Tailwind CSS.
 
-## Editar um texto ou imagem
-
-1. Edite o HTML em `docs/<pagina>/index.html` (a home é `docs/index.html`).
-2. Para trocar uma imagem, substitua o arquivo em `docs/wp-content/uploads/...` mantendo o mesmo nome
-   (o WordPress gera versões redimensionadas, ex. `-300x300.webp`; troque todas ou ajuste o `srcset`).
-3. Teste localmente: `python3 -m http.server 8765 -d docs` e abra http://localhost:8765/
-4. Publique: `git add -A && git commit -m "..." && git push`. O site atualiza em ~1 minuto.
-
-## Recopiar tudo do site original
-
-Se o site original (WordPress) mudar e você quiser espelhar de novo:
+## Rodar localmente
 
 ```bash
-./mirror.sh       # baixa o WordPress para _mirror/
-python3 build.py  # gera docs/ com o domínio novo
+npm install
+npm run dev        # desenvolvimento em http://localhost:4321/
+npm run build      # gera o site estático em dist/
+npm run preview    # serve o dist/ em http://localhost:4321/
 ```
 
-Atenção: isso sobrescreve edições feitas manualmente em `docs/`. Para uma alteração sobreviver ao rebuild,
-coloque o arquivo em `overrides/` com o mesmo caminho que ele tem em `docs/`. Os originais das imagens
-geradas ficam em `sources/`.
+## Onde editar
+
+| O quê | Arquivo |
+|---|---|
+| Endereço, telefone, horário, nota e depoimentos do Google | `src/data/loja.json` |
+| Textos, perguntas frequentes e imagens de cada serviço | `src/data/servicos.ts` |
+| Bairros atendidos (e redirecionamentos das páginas antigas) | `src/data/bairros.ts` |
+| Home | `src/pages/index.astro` |
+| Cores e fontes | `src/styles/global.css` |
+| Imagens | `src/assets/img/` |
+
+## Publicar em subpasta
+
+Por padrão o site é gerado para `https://lambeijospetshopbh.com.br/`. Para outra URL ou subpasta (ex.: GitHub Pages):
+
+```bash
+SITE=https://usuario.github.io BASE=/lambeijospetshopbh/ npm run build
+```

@@ -1,0 +1,28 @@
+---
+interface Props {
+  itens: { pergunta: string; resposta: string }[];
+  titulo?: string;
+}
+const { itens, titulo = "Perguntas frequentes" } = Astro.props;
+---
+
+<section class="py-16 sm:py-24">
+  <div class="container-site grid gap-10 lg:grid-cols-[1fr_2fr]">
+    <div data-reveal>
+      <span class="eyebrow">💬 Dúvidas</span>
+      <h2 class="section-title mt-4">{titulo}</h2>
+      <p class="mt-4 text-lg text-gray-600">Não encontrou o que procurava? Chame a gente no WhatsApp.</p>
+    </div>
+    <div class="grid gap-3">
+      {itens.map((item, i) => (
+        <details class="group rounded-3xl bg-white px-6 shadow-sm ring-1 ring-black/5 transition open:shadow-lg" data-reveal style={`--reveal-delay:${i * 60}ms`} name="faq">
+          <summary class="flex cursor-pointer list-none items-center justify-between gap-4 py-5 font-display text-lg font-semibold text-azul-900 [&::-webkit-details-marker]:hidden">
+            {item.pergunta}
+            <span class="grid size-8 shrink-0 place-items-center rounded-full bg-azul-100 text-azul-700 transition group-open:rotate-45" aria-hidden="true">+</span>
+          </summary>
+          <p class="pb-6 leading-relaxed text-gray-700">{item.resposta}</p>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>
