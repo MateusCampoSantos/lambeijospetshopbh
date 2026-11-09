@@ -9,6 +9,8 @@ from pathlib import Path
 OLD_DOMAIN = "petshopcastelobh.com.br"
 NEW_DOMAIN = "lambeijospetshopbh.com.br"
 NEW_URL = f"https://{NEW_DOMAIN}"
+# Enquanto o DNS não aponta para o GitHub, o site é servido em mateuscamposantos.github.io/lambeijospetshopbh/.
+USE_CUSTOM_DOMAIN = False
 
 ROOT = Path(__file__).parent
 SRC = ROOT / "_mirror"
@@ -62,11 +64,22 @@ def rewrite(text: str) -> str:
     return text
 
 
+def relativize(text: str, prefix: str) -> str:
+    """Troca caminhos "/x" por relativos, para o site funcionar na raiz do domínio e em subpasta (github.io)."""
+
+    def fix_attr(m: re.Match) -> str:
+        return re.sub(r"(^|[\"'\s,])/(?!/)", rf"\g<1>{prefix}", m.group(0))
+
+    text = re.sub(r"(?:href|src|srcset|data-src|data-srcset)=([\"'])[^\"']*\1", fix_attr, text)
+    text = re.sub(r"url\(([\"']?)/(?!/)", rf"url(\g<1>{prefix}", text)
+    escaped = prefix.replace("/", "\\/")
+    return re.sub(r"\"\\/wp-", f'"{escaped}wp-', text)
+
+
 def main() -> None:
     if OUT.exists():
         for child in OUT.iterdir():
-            if child.name != "CNAME":
-                shutil.rmtree(child) if child.is_dir() else child.unlink()
+            shutil.rmtree(child) if child.is_dir() else child.unlink()
     OUT.mkdir(exist_ok=True)
 
     pages = []
@@ -83,6 +96,10 @@ def main() -> None:
             data = src.read_text(encoding="utf-8", errors="surrogateescape")
             if src.name.endswith((".html", ".css")) or ".css?" in src.name:
                 data = rewrite(data)
+                if rel == "index.html":
+                    root_index = data
+                depth = len(dest.parent.relative_to(OUT).parts)
+                data = relativize(data, "../" * depth or "./")
             dest.write_text(data, encoding="utf-8", errors="surrogateescape")
         else:
             shutil.copy2(src, dest)
@@ -91,9 +108,11 @@ def main() -> None:
             path = dest.parent.relative_to(OUT).as_posix()
             pages.append("/" if path == "." else f"/{path}/")
 
-    shutil.copy2(OUT / "index.html", OUT / "404.html")
+    # O 404 é servido em qualquer profundidade de URL, então mantém caminhos a partir da raiz.
+    (OUT / "404.html").write_text(root_index, encoding="utf-8", errors="surrogateescape")
     (OUT / ".nojekyll").touch()
-    (OUT / "CNAME").write_text(NEW_DOMAIN + "\n")
+    if USE_CUSTOM_DOMAIN:
+        (OUT / "CNAME").write_text(NEW_DOMAIN + "\n")
 
     today = date.today().isoformat()
     urls = "\n".join(
